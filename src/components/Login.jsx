@@ -1,5 +1,13 @@
-export function Login() {
-  return <div>Login</div>;
-}
+import { CreateUserForm } from "./CreateUserForm";
+import { LoginForm } from "./LoginForm";
+import { Separator } from "./Separator";
 
-export default Login;
+export function Login() {
+  return (
+    <main className="flex w-full items-center justify-center ">
+      <LoginForm />
+      <Separator />
+      <CreateUserForm />
+    </main>
+  );
+}

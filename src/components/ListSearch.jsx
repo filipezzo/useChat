@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Icon } from "./Icon";
+import { ListAddUser } from "./ListAddUser";
 
 export function ListSearch() {
   const [isMinus, setIsMinus] = useState(false);
@@ -14,11 +15,12 @@ export function ListSearch() {
         className="flex size-10 items-center justify-center rounded-md bg-metalic p-2"
       >
         <Icon
-          src={isMinus ? "/minus.png" : "/plus.png"}
+          src={isMinus ? "./minus.png" : "./plus.png"}
           alt="adicionar"
           className="size-3 object-center"
         />
       </div>
+      {isMinus && <ListAddUser />}
     </div>
   );
 }

@@ -11,6 +11,7 @@ export default {
       },
       backgroundColor: {
         metalic: "rgba(17,25,40,0.5)",
+        metalic2: "rgba(17,25,40,0.8)",
       },
       borderColor: {
         metalic: "#dddddd35",

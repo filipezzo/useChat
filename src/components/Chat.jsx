@@ -1,27 +1,42 @@
-import { useEffect, useRef } from "react";
+import { doc, onSnapshot } from "firebase/firestore";
+import { useEffect, useRef, useState } from "react";
+import { db } from "../lib/firebase";
 import ChatFooter from "./ChatFooter";
 import { ChatHeader } from "./ChatHeader";
 import ChatMessage from "./ChatMessage";
 
 export function Chat() {
-  const endRef = useRef(null);
+	const endRef = useRef(null);
+	const [chat, setChat] = useState(null);
 
-  useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, []);
-  return (
-    <div className="flex flex-grow-2 flex-col border-l border-r border-l-metalic border-r-metalic">
-      <ChatHeader />
-      <section className="relative flex flex-1 flex-col gap-5 overflow-scroll border-b border-b-metalic p-5">
-        <ChatMessage />
-        <ChatMessage owner />
-        <ChatMessage />
-        <ChatMessage owner />
-        <ChatMessage hasImg />
-        <ChatMessage owner />
-        <div ref={endRef} />
-      </section>
-      <ChatFooter />
-    </div>
-  );
+	useEffect(() => {
+		endRef.current?.scrollIntoView({ behavior: "smooth" });
+	}, []);
+
+	useEffect(() => {
+		const unSub = onSnapshot(
+			doc(db, "chats", "Gwl83HucNqKJQdE2wFUr"),
+			(res) => {
+				setChat(res.data());
+			},
+		);
+
+		return () => unSub();
+	}, []);
+
+	return (
+		<div className="flex flex-grow-2 flex-col border-l border-r border-l-metalic border-r-metalic">
+			<ChatHeader />
+			<section className="relative flex flex-1 flex-col gap-5 overflow-scroll border-b border-b-metalic p-5">
+				<ChatMessage />
+				<ChatMessage owner />
+				<ChatMessage />
+				<ChatMessage owner />
+				<ChatMessage hasImg />
+				<ChatMessage owner />
+				<div ref={endRef} />
+			</section>
+			<ChatFooter />
+		</div>
+	);
 }
