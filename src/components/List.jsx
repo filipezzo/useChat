@@ -1,5 +1,6 @@
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
+import { useChatStore } from "../lib/chatStore";
 import { db } from "../lib/firebase";
 import { useUserStore } from "../lib/userStore";
 import { ListChat } from "./ListChat";
@@ -9,9 +10,44 @@ import { ListSearch } from "./ListSearch";
 
 export function List() {
 	const [chats, setChats] = useState([]);
+	const [inputSearch, setInputSearch] = useState("");
 	const { currentUser } = useUserStore();
+	const { changeChat } = useChatStore();
+
+	const handleSearch = (input) => {
+		setInputSearch(input);
+	};
+
+	const handleFetchChat = async (chat) => {
+		const userChats = chats.map((item) => {
+			const { user, ...rest } = item;
+			return rest;
+		});
+
+		const chatIndex = userChats.findIndex(
+			(item) => item.chatId === chat.chatId,
+		);
+
+		userChats[chatIndex].isSeen = true;
+
+		const userChatsRef = doc(db, "userchats", currentUser.id);
+
+		try {
+			await updateDoc(userChatsRef, {
+				chats: userChats,
+			});
+			changeChat(chat.chatId, chat.user);
+		} catch (err) {
+			console.log(err);
+		}
+	};
+
+	const filteredChats = chats.filter((c) =>
+		c.user.username.toLowerCase().includes(inputSearch.toLowerCase()),
+	);
+
 	useEffect(() => {
-		const unsub = onSnapshot(
+		const unSub = onSnapshot(
 			doc(db, "userchats", currentUser.id),
 			async (res) => {
 				const items = res.data().chats;
@@ -26,24 +62,24 @@ export function List() {
 				});
 
 				const chatData = await Promise.all(promises);
+
 				setChats(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
 			},
 		);
 
 		return () => {
-			unsub();
+			unSub();
 		};
 	}, [currentUser.id]);
 
 	return (
 		<div className="flex flex-1 flex-col p-5">
 			<ListHeader />
-			<ListSearch />
+			<ListSearch onSearch={handleSearch} inputSearch={inputSearch} />
 			<ListChat>
-				{chats?.map((chat) => (
-					<ListItem key={chat.chatId} chat={chat} />
+				{filteredChats?.map((chat) => (
+					<ListItem key={chat.chatId} chat={chat} onFetch={handleFetchChat} />
 				))}
-				<ListItem />
 			</ListChat>
 		</div>
 	);

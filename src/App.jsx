@@ -6,11 +6,13 @@ import { List } from "./components/List";
 import { Loader } from "./components/Loader";
 import { Login } from "./components/Login";
 import { Notification } from "./components/Notification";
+import { useChatStore } from "./lib/chatStore";
 import { auth } from "./lib/firebase";
 import { useUserStore } from "./lib/userStore";
 
 function App() {
 	const { currentUser, isLoading, fetchUserInfo } = useUserStore();
+	const { chatId } = useChatStore();
 
 	useEffect(() => {
 		const unSub = onAuthStateChanged(auth, (user) => {
@@ -28,12 +30,12 @@ function App() {
 			</div>
 		);
 	return (
-		<div className="effect container mx-auto flex h-full w-full rounded-md  ">
+		<div className="effect container mx-auto flex h-full w-full  rounded-md  ">
 			{currentUser ? (
 				<>
 					<List />
-					<Chat />
-					<Details />
+					{chatId && <Chat />}
+					{chatId && <Details />}
 				</>
 			) : (
 				<Login />

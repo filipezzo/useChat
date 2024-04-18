@@ -1,6 +1,5 @@
 import { Button } from "./Button";
 import { Profile } from "./Profile";
-
 export function ListAddUserItem({ user, onAddUser }) {
 	return (
 		<li className="flex items-center justify-between">
